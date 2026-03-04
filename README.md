@@ -10,24 +10,24 @@ Port **8766** (different from SuperPutty Mac on 8765).
 
 ## Features
 
-| Tab | What it does |
-|---|---|
-| **IPv4 Subnet** | Full breakdown of any IP/prefix — network, broadcast, host range, binary representation, class, type, supernet and next-split info |
-| **Split Subnet** | Divide a network into equal-sized subnets — by count *or* by minimum hosts per subnet |
-| **VLSM** | Variable-Length Subnet Masking — allocate subnets of different sizes from a parent network; shows remaining unallocated space |
-| **Supernet** | Collapse/summarise a list of networks into the minimum covering set of prefixes |
-| **Range → CIDR** | Convert a start/end IP range to the minimum set of CIDR blocks |
-| **Wildcard / ACL** | Generate wildcard masks plus ready-to-paste Cisco IOS ACL statements, OSPF/EIGRP/BGP network statements, prefix lists, and JunOS route-filters |
-| **IPv6** | Analyse any IPv6 address or prefix — compressed/expanded forms, network address, type flags (link-local, ULA, GUA, multicast, loopback, 6to4, NAT64) |
-| **Reference** | Full /0–/32 subnet mask table, RFC 1918 private ranges, special-purpose ranges (loopback, APIPA, documentation, CG-NAT, benchmark), IPv6 address types, and common well-known ports |
+| Tab                | What it does                                                                                                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **IPv4 Subnet**    | Full breakdown of any IP/prefix — network, broadcast, host range, binary representation, class, type, supernet and next-split info                                                  |
+| **Split Subnet**   | Divide a network into equal-sized subnets — by count _or_ by minimum hosts per subnet                                                                                               |
+| **VLSM**           | Variable-Length Subnet Masking — allocate subnets of different sizes from a parent network; shows remaining unallocated space                                                       |
+| **Supernet**       | Collapse/summarise a list of networks into the minimum covering set of prefixes                                                                                                     |
+| **Range → CIDR**   | Convert a start/end IP range to the minimum set of CIDR blocks                                                                                                                      |
+| **Wildcard / ACL** | Generate wildcard masks plus ready-to-paste Cisco IOS ACL statements, OSPF/EIGRP/BGP network statements, prefix lists, and JunOS route-filters                                      |
+| **IPv6**           | Analyse any IPv6 address or prefix — compressed/expanded forms, network address, type flags (link-local, ULA, GUA, multicast, loopback, 6to4, NAT64)                                |
+| **Reference**      | Full /0–/32 subnet mask table, RFC 1918 private ranges, special-purpose ranges (loopback, APIPA, documentation, CG-NAT, benchmark), IPv6 address types, and common well-known ports |
 
 ---
 
 ## Prerequisites
 
-| Requirement | Notes |
-|---|---|
-| macOS | Tested on macOS 15 (Apple Silicon) and macOS 14 (Intel) |
+| Requirement              | Notes                                                          |
+| ------------------------ | -------------------------------------------------------------- |
+| macOS                    | Tested on macOS 15 (Apple Silicon) and macOS 14 (Intel)        |
 | Xcode Command Line Tools | Provides `/usr/bin/python3`. Install: `xcode-select --install` |
 
 That's it. No `pip`, no virtual environments, no dependencies.
@@ -49,6 +49,7 @@ open "Subnet Calculator.app"
 The script starts a local web server on **port 8766**, then opens `http://127.0.0.1:8766/` in your default browser automatically.
 
 The server shuts down cleanly when you:
+
 - Close the browser tab
 - Press **Ctrl-C** in the terminal
 - Double-click the app again (it kills any stale process on the port first)
@@ -64,7 +65,8 @@ bash make_app.sh
 ```
 
 This:
-1. Generates a 512 × 512 px custom icon (`create_icon.py`, pure Python, no deps)
+
+1. Generates a 1024 × 1024 px rounded custom icon (`create_icon.py`, pure Python, no deps), plus a 512 × 512 derivative
 2. Creates a macOS `.iconset` at all required sizes using `sips`
 3. Compiles to `.icns` with `iconutil`
 4. Assembles the `.app` bundle with `Info.plist` and a launcher stub
@@ -83,6 +85,7 @@ cp -r "Subnet Calculator.app" /Applications/
 subnetCalculator/
 ├── subnet_calculator.py     # Main Python app (server + embedded UI)
 ├── create_icon.py           # Icon generator (pure Python, no deps)
+├── icon_1024.png            # Temporary build artifact (generated, then removed by make_app.sh)
 ├── make_app.sh              # Builds Subnet Calculator.app (run once)
 ├── README.md                # This file
 ├── CODE_OVERVIEW.md         # Technical walkthrough of the code
@@ -113,19 +116,19 @@ Accepts any of these input formats:
 
 Results include:
 
-| Field | Description |
-|---|---|
-| Network Address | First address in the subnet |
-| Broadcast | Last address (N/A for /31 and /32) |
-| First/Last Host | Usable host range |
-| Usable Hosts | Addresses minus network and broadcast |
-| Subnet Mask | Dotted-decimal mask |
-| Wildcard Mask | Inverse mask (`255.255.255.255 − mask`) |
-| CIDR Notation | Compact prefix form |
-| IP Class | A / B / C / D (multicast) / E (reserved) |
-| IP Type | Private / Public / Loopback / Link-local / etc. |
-| Supernet | The /N−1 parent prefix |
-| Next Split | How many /N+1 subnets this network divides into |
+| Field            | Description                                                                                   |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| Network Address  | First address in the subnet                                                                   |
+| Broadcast        | Last address (N/A for /31 and /32)                                                            |
+| First/Last Host  | Usable host range                                                                             |
+| Usable Hosts     | Addresses minus network and broadcast                                                         |
+| Subnet Mask      | Dotted-decimal mask                                                                           |
+| Wildcard Mask    | Inverse mask (`255.255.255.255 − mask`)                                                       |
+| CIDR Notation    | Compact prefix form                                                                           |
+| IP Class         | A / B / C / D (multicast) / E (reserved)                                                      |
+| IP Type          | Private / Public / Loopback / Link-local / etc.                                               |
+| Supernet         | The /N−1 parent prefix                                                                        |
+| Next Split       | How many /N+1 subnets this network divides into                                               |
 | **Binary table** | All four addresses shown in binary with network bits (blue) and host bits (green) highlighted |
 
 All values have a **Copy** button.
@@ -180,19 +183,19 @@ Enter a start IP and end IP. The tool returns the minimum list of CIDR blocks th
 
 Generates:
 
-| Output | Example |
-|---|---|
-| Wildcard Mask | `0.0.0.255` |
-| Cisco Standard ACL | `access-list 10 permit 192.168.1.0 0.0.0.255` |
+| Output             | Example                                               |
+| ------------------ | ----------------------------------------------------- |
+| Wildcard Mask      | `0.0.0.255`                                           |
+| Cisco Standard ACL | `access-list 10 permit 192.168.1.0 0.0.0.255`         |
 | Cisco Extended ACL | `access-list 100 permit ip 192.168.1.0 0.0.0.255 any` |
-| Named Standard ACL | `ip access-list standard MY_ACL` … |
-| Named Extended ACL | `ip access-list extended MY_ACL` … |
-| OSPF network | `network 192.168.1.0 0.0.0.255 area 0` |
-| EIGRP network | `network 192.168.1.0 0.0.0.255` |
-| BGP network | `network 192.168.1.0 mask 255.255.255.0` |
-| Cisco prefix-list | `ip prefix-list PL_NAME permit 192.168.1.0/24` |
-| JunOS route-filter | `route-filter 192.168.1.0/24 exact;` |
-| NAT object-network | `object network OBJ_…` … |
+| Named Standard ACL | `ip access-list standard MY_ACL` …                    |
+| Named Extended ACL | `ip access-list extended MY_ACL` …                    |
+| OSPF network       | `network 192.168.1.0 0.0.0.255 area 0`                |
+| EIGRP network      | `network 192.168.1.0 0.0.0.255`                       |
+| BGP network        | `network 192.168.1.0 mask 255.255.255.0`              |
+| Cisco prefix-list  | `ip prefix-list PL_NAME permit 192.168.1.0/24`        |
+| JunOS route-filter | `route-filter 192.168.1.0/24 exact;`                  |
+| NAT object-network | `object network OBJ_…` …                              |
 
 ---
 
@@ -210,6 +213,7 @@ fc00::/7
 Output includes the compressed form, fully expanded (exploded) form, network address, total address count, and all applicable type flags.
 
 Special types recognised:
+
 - **GUA** — Global Unicast (`2000::/3`)
 - **Link-local** (`fe80::/10`)
 - **ULA / Private** (`fc00::/7`)
@@ -222,11 +226,11 @@ Special types recognised:
 
 ## Keyboard Shortcuts
 
-| Key | Action |
-|---|---|
-| **Enter** | Submit the active input |
+| Key            | Action                                                           |
+| -------------- | ---------------------------------------------------------------- |
+| **Enter**      | Submit the active input                                          |
 | Auto-calculate | IPv4 and Wildcard tabs recalculate ~600 ms after you stop typing |
-| **Ctrl-C** | Stop the server (in terminal) |
+| **Ctrl-C**     | Stop the server (in terminal)                                    |
 
 ---
 
@@ -266,7 +270,7 @@ bash make_app.sh
 
 ## Port Reference
 
-| App | Port |
-|---|---|
-| SuperPutty Mac | 8765 |
+| App                   | Port     |
+| --------------------- | -------- |
+| SuperPutty Mac        | 8765     |
 | **Subnet Calculator** | **8766** |

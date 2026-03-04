@@ -6,7 +6,7 @@
 #   bash make_app.sh
 #
 # What it does:
-#   1. Generates icon_512.png via create_icon.py (pure Python, no deps)
+#   1. Generates icon_1024.png via create_icon.py (pure Python, no deps)
 #   2. Creates a macOS .iconset from that PNG using sips
 #   3. Compiles the iconset to a .icns file with iconutil
 #   4. Assembles a standard .app bundle (Contents/MacOS + Contents/Resources)
@@ -33,36 +33,37 @@ echo ""
 echo "▶ Generating icon…"
 /usr/bin/python3 "$SCRIPT_DIR/create_icon.py"
 
-PNG_512="$SCRIPT_DIR/icon_512.png"
-if [ ! -f "$PNG_512" ]; then
-    echo "  ERROR: icon_512.png was not created."
+PNG_1024="$SCRIPT_DIR/icon_1024.png"
+if [ ! -f "$PNG_1024" ]; then
+  echo "  ERROR: icon_1024.png was not created."
     exit 1
 fi
 
-# ── 2. Build iconset from the 512-px PNG ─────────────────────────────────────
+# ── 2. Build iconset from the 1024-px PNG ────────────────────────────────────
 echo "▶ Building iconset…"
 ICONSET="$SCRIPT_DIR/SubnetCalc.iconset"
 rm -rf "$ICONSET"
 mkdir -p "$ICONSET"
 
-# sips resizes from the base 512-px PNG to each required size
-sips -z 16   16   "$PNG_512" --out "$ICONSET/icon_16x16.png"        > /dev/null
-sips -z 32   32   "$PNG_512" --out "$ICONSET/icon_16x16@2x.png"     > /dev/null
-sips -z 32   32   "$PNG_512" --out "$ICONSET/icon_32x32.png"        > /dev/null
-sips -z 64   64   "$PNG_512" --out "$ICONSET/icon_32x32@2x.png"     > /dev/null
-sips -z 128  128  "$PNG_512" --out "$ICONSET/icon_128x128.png"      > /dev/null
-sips -z 256  256  "$PNG_512" --out "$ICONSET/icon_128x128@2x.png"   > /dev/null
-sips -z 256  256  "$PNG_512" --out "$ICONSET/icon_256x256.png"      > /dev/null
-sips -z 512  512  "$PNG_512" --out "$ICONSET/icon_256x256@2x.png"   > /dev/null
-cp   "$PNG_512"               "$ICONSET/icon_512x512.png"
-sips -z 512  512  "$PNG_512" --out "$ICONSET/icon_512x512@2x.png"   > /dev/null
+# sips resizes from the base 1024-px PNG to each required size
+sips -z 16   16   "$PNG_1024" --out "$ICONSET/icon_16x16.png"        > /dev/null
+sips -z 32   32   "$PNG_1024" --out "$ICONSET/icon_16x16@2x.png"     > /dev/null
+sips -z 32   32   "$PNG_1024" --out "$ICONSET/icon_32x32.png"        > /dev/null
+sips -z 64   64   "$PNG_1024" --out "$ICONSET/icon_32x32@2x.png"     > /dev/null
+sips -z 128  128  "$PNG_1024" --out "$ICONSET/icon_128x128.png"      > /dev/null
+sips -z 256  256  "$PNG_1024" --out "$ICONSET/icon_128x128@2x.png"   > /dev/null
+sips -z 256  256  "$PNG_1024" --out "$ICONSET/icon_256x256.png"      > /dev/null
+sips -z 512  512  "$PNG_1024" --out "$ICONSET/icon_256x256@2x.png"   > /dev/null
+sips -z 512  512  "$PNG_1024" --out "$ICONSET/icon_512x512.png"      > /dev/null
+cp   "$PNG_1024"              "$ICONSET/icon_512x512@2x.png"
 
 # ── 3. Compile to .icns ───────────────────────────────────────────────────────
 echo "▶ Compiling .icns…"
 ICNS="$SCRIPT_DIR/SubnetCalc.icns"
 iconutil -c icns "$ICONSET" -o "$ICNS"
 rm -rf "$ICONSET"          # clean up temporary iconset
-rm -f  "$PNG_512"          # clean up intermediate PNG
+rm -f  "$PNG_1024"         # clean up intermediate PNG
+rm -f  "$SCRIPT_DIR/icon_512.png"
 
 # ── 4. Assemble .app bundle ───────────────────────────────────────────────────
 echo "▶ Assembling app bundle…"
@@ -118,4 +119,4 @@ echo "    /usr/bin/python3 '$SCRIPT_DIR/subnet_calculator.py'"
 echo ""
 echo "  To install system-wide:"
 echo "    cp -r '$APP_NAME.app' /Applications/"
-echo ""
+echo “"
